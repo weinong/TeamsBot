@@ -5,6 +5,7 @@ dist/
 .env
 .env.*
 !env/.env.*.sample
+!.env.example
 .DS_Store
 appPackage/build/
 certs/
@@ -15,12 +16,12 @@ certs/
 
 # Bicep transpiled ARM
 infra/*.json
-
+
 # Local test scratch files
 webchat-test.html
 
-# Teams sideload build artifacts (zip is rebuilt by Compress-Archive; id marker is
-# duplicated in manifest.json)
+# Teams sideload build artifacts — manifest.json is rendered from
+# manifest.template.json by scripts/build-teams-package.ps1 at build time.
+appPackage/manifest.json
 appPackage/*.zip
 appPackage/.teams-app-id
-

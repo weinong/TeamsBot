@@ -17,7 +17,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$SubscriptionId   = '${AZURE_SUBSCRIPTION_ID}',
+    [string]$SubscriptionId   = $env:AZURE_SUBSCRIPTION_ID,
     [string]$ResourceGroup    = 'weinongw-oai',
     [string]$Location         = 'westus3',
     [string]$NamePrefix       = 'weinongw-faqbot',
@@ -30,6 +30,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+
+if (-not $SubscriptionId) {
+    throw "SubscriptionId not provided. Set `$env:AZURE_SUBSCRIPTION_ID or pass -SubscriptionId <guid>. See .env.example."
+}
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 

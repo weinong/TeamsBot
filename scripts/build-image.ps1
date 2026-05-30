@@ -9,7 +9,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$SubscriptionId  = '${AZURE_SUBSCRIPTION_ID}',
+    [string]$SubscriptionId  = $env:AZURE_SUBSCRIPTION_ID,
     [string]$AcrName         = 'acrweinongwfaqbot',
     [string]$ImageRepository = 'teams-faq-bot',
     [string]$ImageTag        = 'latest'
@@ -17,6 +17,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
+
+if (-not $SubscriptionId) {
+    throw "SubscriptionId not provided. Set `$env:AZURE_SUBSCRIPTION_ID or pass -SubscriptionId <guid>. See .env.example."
+}
 
 az account set --subscription $SubscriptionId | Out-Null
 

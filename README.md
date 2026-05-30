@@ -34,16 +34,19 @@ src/
 data/
   faq.md              # Replace with your own FAQ content
 appPackage/
-  manifest.json       # Teams app manifest (sideload into Teams)
+  manifest.template.json    # Teams app manifest template (${BOT_APP_ID} is rendered at build time)
+  color.png                 # 192x192 color icon
+  outline.png               # 32x32 transparent outline icon
 infra/
   infra.bicep         # UAMI, ACR, Log Analytics, Container Apps Env, RBAC
   app.bicep           # Container App + Azure Bot (UserAssignedMSI)
   *.bicepparam        # Parameter files
 scripts/
-  deploy.ps1          # Full bootstrap: infra -> build image -> app
-  build-image.ps1     # Rebuild + push image via ACR Tasks
-  update.ps1          # Quick code redeploy (build + roll Container App)
-  generate-cert.js    # (Unused for UAMI; kept for cert-auth scenarios)
+  deploy.ps1               # Full bootstrap: infra -> build image -> app
+  build-image.ps1          # Rebuild + push image via ACR Tasks
+  update.ps1               # Quick code redeploy (build + roll Container App)
+  build-teams-package.ps1  # Render manifest from template + zip into sideload package
+  generate-cert.js         # (Unused for UAMI; kept for cert-auth scenarios)
 Dockerfile
 .dockerignore
 env/.env.local.sample # Copy to env/.env.local for local dev
@@ -135,6 +138,12 @@ All infrastructure is defined in Bicep and orchestrated by PowerShell scripts.
 ### First-time deploy
 
 ```powershell
+# Copy .env.example -> .env and fill in AZURE_SUBSCRIPTION_ID + BOT_APP_ID,
+# then load it into the current shell:
+Get-Content .env | ForEach-Object {
+  if ($_ -match '^\s*([^#=][^=]*)=(.*)$') { Set-Item -Path "env:$($Matches[1].Trim())" -Value $Matches[2].Trim() }
+}
+
 # Uses the defaults baked into the scripts and bicepparam files
 ./scripts/deploy.ps1
 
@@ -209,12 +218,24 @@ Every resource name is derived from `-NamePrefix`:
 
 ### Sideload into Teams
 
-1. Edit `appPackage/manifest.json` if needed (icons, names). `botId` is
-   pre-populated with the UAMI client ID.
-2. Add two PNG icons next to the manifest: `color.png` (192×192) and
-   `outline.png` (32×32 transparent).
-3. Zip the three files and upload via Teams → **Apps → Manage your apps →
-   Upload an app**.
+The manifest is generated from `appPackage/manifest.template.json` at build time
+so no IDs are checked into source control.
+
+```powershell
+# Option A — explicit value
+$env:BOT_APP_ID = '<uami-client-id>'
+./scripts/build-teams-package.ps1
+
+# Option B — auto-discover from the deployed Azure Bot
+./scripts/build-teams-package.ps1 -ResourceGroup weinongw-oai -BotName bot-weinongw-faqbot
+```
+
+This writes `appPackage/manifest.json` (gitignored) and zips it together with
+`color.png` + `outline.png` into `appPackage/faqbot-teams-app.zip`.
+
+Then in Teams: **Apps → Manage your apps → Upload an app → Upload a custom app**,
+pick the zip. In personal scope every message reaches the bot; in channel /
+group-chat scope an `@FAQ Bot` mention is required.
 
 ## Updating the FAQ
 
