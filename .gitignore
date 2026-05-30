@@ -1,0 +1,14 @@
+node_modules/
+lib/
+dist/
+*.log
+.env
+.env.*
+!env/.env.*.sample
+.DS_Store
+appPackage/build/
+certs/
+*.pem
+*.pfx
+*.key
+*.cer

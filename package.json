@@ -1,0 +1,29 @@
+{
+  "name": "teams-faq-bot",
+  "version": "0.1.0",
+  "description": "Microsoft Teams bot that answers FAQs using Azure OpenAI with RAG over a local FAQ file.",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc && npm run copy:assets",
+    "copy:assets": "node -e \"const fs=require('fs'),p=require('path');function cp(s,d){fs.mkdirSync(d,{recursive:true});for(const f of fs.readdirSync(s)){const sp=p.join(s,f),dp=p.join(d,f);fs.statSync(sp).isDirectory()?cp(sp,dp):fs.copyFileSync(sp,dp);}}cp('src/prompts','lib/prompts');cp('data','lib/data');\"",
+    "start": "node lib/index.js",
+    "dev": "npm run build && npm start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.13.1",
+    "@microsoft/teams-ai": "^1.5.0",
+    "botbuilder": "^4.22.3",
+    "dotenv": "^16.4.5",
+    "openai": "^4.55.0",
+    "restify": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@types/restify": "^8.5.12",
+    "typescript": "^5.4.5"
+  }
+}
