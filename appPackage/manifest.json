@@ -2,13 +2,13 @@
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
   "version": "0.1.0",
-  "id": "00000000-0000-0000-0000-000000000000",
+  "id": "2a165570-d361-48a2-bc05-2eccaa53c541",
   "packageName": "com.example.teamsfaqbot",
   "developer": {
-    "name": "Your Company",
-    "websiteUrl": "https://example.com",
-    "privacyUrl": "https://example.com/privacy",
-    "termsOfUseUrl": "https://example.com/terms"
+    "name": "Weinong Wang",
+    "websiteUrl": "https://eng.ms",
+    "privacyUrl": "https://eng.ms/privacy",
+    "termsOfUseUrl": "https://eng.ms/terms"
   },
   "icons": {
     "color": "color.png",

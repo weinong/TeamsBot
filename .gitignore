@@ -15,4 +15,12 @@ certs/
 
 # Bicep transpiled ARM
 infra/*.json
+
+# Local test scratch files
+webchat-test.html
+
+# Teams sideload build artifacts (zip is rebuilt by Compress-Archive; id marker is
+# duplicated in manifest.json)
+appPackage/*.zip
+appPackage/.teams-app-id
 

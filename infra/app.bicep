@@ -152,6 +152,21 @@ resource bot 'Microsoft.BotService/botServices@2022-09-15' = {
   }
 }
 
+// Channels — Web Chat & Direct Line are auto-provisioned with the bot.
+// Add the Microsoft Teams channel so the app can be sideloaded into Teams.
+resource teamsChannel 'Microsoft.BotService/botServices/channels@2022-09-15' = {
+  parent: bot
+  name: 'MsTeamsChannel'
+  location: 'global'
+  properties: {
+    channelName: 'MsTeamsChannel'
+    properties: {
+      isEnabled: true
+      enableCalling: false
+    }
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Outputs
 // -----------------------------------------------------------------------------
