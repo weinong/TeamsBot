@@ -12,3 +12,7 @@ certs/
 *.pfx
 *.key
 *.cer
+
+# Bicep transpiled ARM
+infra/*.json
+

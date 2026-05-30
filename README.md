@@ -251,3 +251,11 @@ the rollout completes.
 - Tenants with Entra app-management policies that forbid client secrets and
   certificates (the original reason this project uses UAMI) do not block
   UAMI auth — managed identities are governed separately.
+- **Web Chat is silent / Test in Web Chat shows no reply:** check the
+  Container App logs for `[auth] Using UserAssignedMSI credentials`. If you
+  see `app-password / anonymous` instead, your image is stale — run
+  `./scripts/update.ps1`.
+- **`az bot show` reports `msaAppMSIResourceId: null` even when it's set.**
+  The CLI is built against an older API version and doesn't surface this
+  field. Verify with:
+  `az rest --method get --uri "https://management.azure.com<botResId>?api-version=2023-09-15-preview" --query properties.msaAppMSIResourceId -o tsv`
