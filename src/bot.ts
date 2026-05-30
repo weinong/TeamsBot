@@ -1,5 +1,5 @@
 import * as path from "path";
-import { MemoryStorage, TurnContext } from "botbuilder";
+import { TurnContext } from "botbuilder";
 import {
     Application,
     ActionPlanner,
@@ -10,6 +10,7 @@ import { config } from "./config";
 import { FAQDataSource } from "./faqDataSource";
 import { patchOpenAIModelForReasoning } from "./openaiPatch";
 import { buildAzureOpenAITokenProvider } from "./azureAuth";
+import { LenientMemoryStorage } from "./lenientMemoryStorage";
 
 const promptsFolder = path.join(__dirname, "prompts");
 
@@ -62,7 +63,7 @@ const faqDataSource = new FAQDataSource({
 prompts.addDataSource(faqDataSource);
 
 export const app = new Application({
-    storage: new MemoryStorage(),
+    storage: new LenientMemoryStorage(),
     ai: { planner },
 });
 

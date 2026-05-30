@@ -10,6 +10,9 @@ import {
 import { CertificateServiceClientCredentialsFactory } from "botframework-connector";
 import { config } from "./config";
 import { app } from "./bot";
+import { patchJwksRefresh } from "./jwksPatch";
+
+patchJwksRefresh();
 
 function buildCredentialsFactory() {
     const { id, password, tenantId, type, certPath, certKeyPath, certThumbprint } = config.bot;
@@ -69,7 +72,29 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
+adapter.use(async (context, next) => {
+    const originalSend = context.sendActivities.bind(context);
+    context.sendActivities = async (activities) => {
+        try {
+            return await originalSend(activities);
+        } catch (err) {
+            console.error(`[send] FAILED:`, err);
+            throw err;
+        }
+    };
+    await next();
+});
+
 adapter.onTurnError = async (context: TurnContext, error: Error) => {
+    // Storage eTag conflicts can happen when multiple activities for the
+    // same conversation are processed in parallel. The user-facing reply has
+    // already been sent at this point; surface a "Sorry" message and we'd be
+    // double-replying. Just log and bail.
+    const msg = (error as Error)?.message ?? "";
+    if (msg.includes("eTag conflict")) {
+        console.warn("[onTurnError] swallowed eTag conflict on state save:", msg);
+        return;
+    }
     console.error("[onTurnError]", error);
     await context.sendTraceActivity(
         "OnTurnError Trace",
